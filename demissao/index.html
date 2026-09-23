@@ -44,10 +44,13 @@
     justify-content: center;
     padding: 18px 0;
     margin-bottom: 20px;
-    background: #0b0f14;
-    border-radius: 12px;
   }
   .brand img { height: 96px; width: auto; display: block; }
+  .brand .logo-light { display: none; }
+  @media (prefers-color-scheme: light) {
+    .brand .logo-dark { display: none; }
+    .brand .logo-light { display: block; }
+  }
   h1 { font-size: 1.4rem; margin: 0 0 24px; text-align: center; letter-spacing: 0.01em; }
   .card {
     background: var(--surface);
@@ -141,7 +144,8 @@
 <body>
 <div class="wrap">
   <div class="brand">
-    <img src="../assets/logo_name_white.png" alt="Vegas Vigilância e Segurança" />
+    <img class="logo-dark" src="../assets/logo_name_white.png" alt="Vegas Vigilância e Segurança" />
+    <img class="logo-light" src="../assets/logo_name_black.png" alt="Vegas Vigilância e Segurança" />
   </div>
   <h1>Formulário demissional</h1>
 
