@@ -176,6 +176,11 @@
       </select>
     </div>
 
+    <div class="field hidden" id="campo-posto">
+      <label for="posto">Posto:</label>
+      <select id="posto"></select>
+    </div>
+
     <div class="field">
       <label for="nomeFuncionario">Nome do funcionário:</label>
       <input type="text" id="nomeFuncionario" required autocomplete="off" />
@@ -271,6 +276,7 @@
   "use strict";
 
   var API_URL = "https://vegas-hub.vercel.app/api/central-de-controle/demissao/submit";
+  var POSTOS_API_URL = "https://vegas-hub.vercel.app/api/central-de-controle/demissao/postos";
 
   var AVISO_PREVIO_POR_DEMISSAO = {
     "Pedido de demissão": ["Realizado", "Não realizado"],
@@ -304,6 +310,8 @@
 
   var elUnidade = $("unidade");
   var elBloco = $("bloco");
+  var elCampoPosto = $("campo-posto");
+  var elPosto = $("posto");
   var elNome = $("nomeFuncionario");
   var elDemissao = $("demissao");
   var elCampoAviso = $("campo-aviso-previo");
@@ -341,6 +349,36 @@
       o.textContent = op;
       select.appendChild(o);
     });
+  }
+
+  // ── Posto (só aparece com Bloco = "Posto de Serviço") ──
+  var nomesPostos = null; // null = ainda não carregou
+  fetch(POSTOS_API_URL)
+    .then(function (res) { return res.json(); })
+    .then(function (json) {
+      if (!json.ok) throw new Error(json.erro || "Falha ao carregar postos");
+      nomesPostos = json.postos.map(function (p) { return p.cidade ? (p.nome + " — " + p.cidade) : p.nome; });
+      atualizarCampoPosto();
+    })
+    .catch(function () {
+      nomesPostos = [];
+      if (!elCampoPosto.classList.contains("hidden")) {
+        elPosto.innerHTML = '<option value="" disabled selected>Não foi possível carregar os postos — recarregue a página</option>';
+      }
+    });
+
+  function atualizarCampoPosto() {
+    if (elBloco.value !== "Posto de Serviço") {
+      elCampoPosto.classList.add("hidden");
+      elPosto.value = "";
+      return;
+    }
+    elCampoPosto.classList.remove("hidden");
+    if (nomesPostos === null) {
+      elPosto.innerHTML = '<option value="" disabled selected>Carregando…</option>';
+    } else {
+      preencherSelect(elPosto, nomesPostos, true);
+    }
   }
 
   function hoje() {
@@ -431,6 +469,7 @@
     }
   }
 
+  elBloco.addEventListener("change", atualizarCampoPosto);
   elDemissao.addEventListener("change", atualizarAvisoPrevio);
   elAviso.addEventListener("change", atualizarDatasAviso);
   elDataAdmissao.addEventListener("change", atualizarTempoServico);
@@ -496,6 +535,10 @@
       mostrarErro("Assine no campo de assinatura antes de enviar.");
       return;
     }
+    if (!elCampoPosto.classList.contains("hidden") && !elPosto.value) {
+      mostrarErro("Selecione o Posto.");
+      return;
+    }
     if (elAviso && !elCampoAviso.classList.contains("hidden") && !elAviso.value) {
       mostrarErro("Selecione o Aviso Prévio.");
       return;
@@ -513,6 +556,7 @@
     var payload = {
       unidade: elUnidade.value,
       bloco: elBloco.value,
+      posto: elCampoPosto.classList.contains("hidden") ? null : (elPosto.value || null),
       nomeFuncionario: elNome.value.trim(),
       demissao: elDemissao.value,
       avisoPrevio: elCampoAviso.classList.contains("hidden") ? null : (elAviso.value || null),
