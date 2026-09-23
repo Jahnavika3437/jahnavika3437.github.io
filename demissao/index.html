@@ -344,7 +344,7 @@
     if (anos < 0) return "—";
     var partes = [];
     if (anos > 0) partes.push(anos + " ano" + (anos !== 1 ? "s" : ""));
-    if (meses > 0) partes.push(meses + " mês" + (meses !== 1 ? "es" : ""));
+    if (meses > 0) partes.push(meses + " " + (meses !== 1 ? "meses" : "mês"));
     if (dias > 0 || partes.length === 0) partes.push(dias + " dia" + (dias !== 1 ? "s" : ""));
     if (partes.length === 1) return partes[0];
     return partes.slice(0, -1).join(", ") + " e " + partes[partes.length - 1];
