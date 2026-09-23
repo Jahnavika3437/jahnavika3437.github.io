@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Formulário demissional — Vegas Vigilância e Segurança</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #0b0f14;
+    --surface: #12181f;
+    --surface-2: #1a222b;
+    --text: #f5f6f7;
+    --muted: #9aa4af;
+    --accent: #d4af37;
+    --border: #2a333e;
+    --danger: #e5534b;
+    --ok: #3fb950;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f2f4f6;
+      --surface: #ffffff;
+      --surface-2: #f7f8fa;
+      --text: #14181d;
+      --muted: #5b6570;
+      --accent: #a8841f;
+      --border: #dde2e7;
+      --danger: #c0392b;
+      --ok: #1f8b3d;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 24px; text-align: center; letter-spacing: 0.01em; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+  .field { margin-bottom: 18px; }
+  .field:last-child { margin-bottom: 0; }
+  select, input[type="text"], input[type="date"] {
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+  }
+  select:focus, input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } }
+  .readonly-value {
+    padding: 11px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--muted);
+    font-size: 0.95rem;
+    min-height: 1.2em;
+  }
+  .hidden { display: none !important; }
+  canvas {
+    width: 100%;
+    height: 180px;
+    display: block;
+    border-radius: 8px;
+    border: 1px dashed var(--border);
+    background: var(--surface-2);
+    touch-action: none;
+    cursor: crosshair;
+  }
+  .sig-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
+  .btn-link {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  button[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: #14181d;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+  }
+  button[type="submit"]:disabled { opacity: 0.6; cursor: default; }
+  .erro {
+    background: color-mix(in srgb, var(--danger) 15%, transparent);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+  }
+  .sucesso { text-align: center; padding: 20px 0; }
+  .sucesso .selo {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--ok); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; margin: 0 auto 16px;
+  }
+  .sucesso .protocolo {
+    font-size: 1.3rem; font-weight: 700; letter-spacing: 0.03em;
+    margin: 8px 0 4px; color: var(--accent);
+  }
+  .sucesso p { color: var(--muted); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Formulário demissional</h1>
+
+  <div class="card" id="erro-geral-box" style="display:none">
+    <div class="erro" id="erro-geral"></div>
+  </div>
+
+  <form class="card" id="form-demissao">
+    <div class="field">
+      <label for="unidade">Unidade:</label>
+      <select id="unidade" required>
+        <option value="" disabled selected>Selecione</option>
+        <option>Volta Redonda</option>
+        <option>Niterói</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="bloco">Bloco:</label>
+      <select id="bloco" required>
+        <option value="" disabled selected>Selecione</option>
+        <option>Eletrônico</option>
+        <option>Posto de Serviço</option>
+        <option>Administração</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="nomeFuncionario">Nome do funcionário:</label>
+      <input type="text" id="nomeFuncionario" required autocomplete="off" />
+    </div>
+
+    <div class="field">
+      <label for="demissao">Demissão:</label>
+      <select id="demissao" required>
+        <option value="" disabled selected>Selecione</option>
+        <option>Pedido de demissão</option>
+        <option>Desligado</option>
+        <option>Justa Causa</option>
+        <option>Fim da Experiência</option>
+        <option>Abandono de emprego</option>
+      </select>
+    </div>
+
+    <div class="field hidden" id="campo-aviso-previo">
+      <label for="avisoPrevio">Aviso Prévio:</label>
+      <select id="avisoPrevio"></select>
+    </div>
+
+    <div class="hidden" id="campos-datas-aviso">
+      <div class="row2">
+        <div class="field">
+          <label for="avisoPrevioInicio">Data inicial do Aviso Prévio:</label>
+          <input type="date" id="avisoPrevioInicio" />
+        </div>
+        <div class="field">
+          <label for="avisoPrevioFim">Data final do Aviso Prévio:</label>
+          <input type="date" id="avisoPrevioFim" />
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="dataAdmissao">Data de admissão:</label>
+      <input type="date" id="dataAdmissao" required />
+    </div>
+
+    <div class="field">
+      <label>Tempo de serviço:</label>
+      <div class="readonly-value" id="tempoServico">—</div>
+    </div>
+
+    <div class="field hidden" id="campo-motivo">
+      <label for="motivo">Motivo:</label>
+      <select id="motivo"></select>
+    </div>
+
+    <div class="field">
+      <label for="responsavelCargo">Responsável:</label>
+      <select id="responsavelCargo" required>
+        <option value="" disabled selected>Selecione</option>
+        <option>Coordenador(a)</option>
+        <option>Diretoria</option>
+        <option>Supervisor(a) de Posto</option>
+        <option>Gerência</option>
+        <option>RH</option>
+      </select>
+    </div>
+
+    <div class="field hidden" id="campo-responsavel-nome">
+      <label for="responsavelNome">&nbsp;</label>
+      <select id="responsavelNome"></select>
+    </div>
+
+    <div class="field">
+      <label>Assinatura:</label>
+      <canvas id="assinatura" width="600" height="200"></canvas>
+      <div class="sig-actions">
+        <button type="button" class="btn-link" id="limpar-assinatura">Limpar assinatura</button>
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:26px">
+      <button type="submit" id="btn-enviar">Enviar</button>
+    </div>
+  </form>
+
+  <div class="card hidden" id="card-sucesso">
+    <div class="sucesso">
+      <div class="selo">✓</div>
+      <p>Formulário enviado com sucesso.</p>
+      <div class="protocolo" id="protocolo-gerado"></div>
+      <p>Guarde este número de protocolo.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var API_URL = "https://vegas-hub.vercel.app/api/central-de-controle/demissao/submit";
+
+  var AVISO_PREVIO_POR_DEMISSAO = {
+    "Pedido de demissão": ["Realizado", "Não realizado"],
+    "Desligado": ["Realizado", "Indenizado"],
+  };
+  var MOTIVOS_POR_DEMISSAO = {
+    "Pedido de demissão": [
+      "Insatisfação profissional",
+      "Nova oportunidade profissional",
+      "Questões relacionadas a gestão",
+      "Mudança de domicílio",
+    ],
+    "Desligado": [
+      "Desempenho abaixo do esperado",
+      "Redução de custos",
+      "Encerramento do posto",
+      "Absenteísmo elevado",
+      "Elevado número de afastamentos",
+      "Rescisão por acordo",
+      "Deliberação da diretoria",
+    ],
+    "Justa Causa": ["Justa causa"],
+  };
+  var NOMES_POR_CARGO = {
+    "Diretoria": ["Juliano", "Gil"],
+    "Gerência": ["Vitor", "Talita"],
+    "RH": ["Carolina", "Hilda", "Simone"],
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  var elUnidade = $("unidade");
+  var elBloco = $("bloco");
+  var elNome = $("nomeFuncionario");
+  var elDemissao = $("demissao");
+  var elCampoAviso = $("campo-aviso-previo");
+  var elAviso = $("avisoPrevio");
+  var elCamposDatasAviso = $("campos-datas-aviso");
+  var elAvisoInicio = $("avisoPrevioInicio");
+  var elAvisoFim = $("avisoPrevioFim");
+  var elDataAdmissao = $("dataAdmissao");
+  var elTempoServico = $("tempoServico");
+  var elCampoMotivo = $("campo-motivo");
+  var elMotivo = $("motivo");
+  var elResponsavelCargo = $("responsavelCargo");
+  var elCampoResponsavelNome = $("campo-responsavel-nome");
+  var elResponsavelNome = $("responsavelNome");
+  var elForm = $("form-demissao");
+  var elBtnEnviar = $("btn-enviar");
+  var elErroBox = $("erro-geral-box");
+  var elErro = $("erro-geral");
+  var elCardSucesso = $("card-sucesso");
+  var elProtocoloGerado = $("protocolo-gerado");
+
+  function preencherSelect(select, opcoes, comPlaceholder) {
+    select.innerHTML = "";
+    if (comPlaceholder) {
+      var ph = document.createElement("option");
+      ph.value = "";
+      ph.disabled = true;
+      ph.selected = true;
+      ph.textContent = "Selecione";
+      select.appendChild(ph);
+    }
+    opcoes.forEach(function (op) {
+      var o = document.createElement("option");
+      o.value = op;
+      o.textContent = op;
+      select.appendChild(o);
+    });
+  }
+
+  function hoje() {
+    var d = new Date();
+    var tz = new Date(d.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+    var y = tz.getFullYear(), m = String(tz.getMonth() + 1).padStart(2, "0"), day = String(tz.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + day;
+  }
+
+  function tempoDeServico(inicioYMD, fimYMD) {
+    var pi = inicioYMD.split("-").map(Number), pf = fimYMD.split("-").map(Number);
+    var ai = pi[0], mi = pi[1], di = pi[2];
+    var af = pf[0], mf = pf[1], df = pf[2];
+    var anos = af - ai, meses = mf - mi, dias = df - di;
+    if (dias < 0) {
+      meses -= 1;
+      dias += new Date(af, mf - 1, 0).getDate();
+    }
+    if (meses < 0) { anos -= 1; meses += 12; }
+    if (anos < 0) return "—";
+    var partes = [];
+    if (anos > 0) partes.push(anos + " ano" + (anos !== 1 ? "s" : ""));
+    if (meses > 0) partes.push(meses + " mês" + (meses !== 1 ? "es" : ""));
+    if (dias > 0 || partes.length === 0) partes.push(dias + " dia" + (dias !== 1 ? "s" : ""));
+    if (partes.length === 1) return partes[0];
+    return partes.slice(0, -1).join(", ") + " e " + partes[partes.length - 1];
+  }
+
+  function atualizarAvisoPrevio() {
+    var opcoes = AVISO_PREVIO_POR_DEMISSAO[elDemissao.value];
+    elAviso.value = "";
+    elAvisoInicio.value = "";
+    elAvisoFim.value = "";
+    if (opcoes) {
+      elCampoAviso.classList.remove("hidden");
+      preencherSelect(elAviso, opcoes, true);
+    } else {
+      elCampoAviso.classList.add("hidden");
+      elCamposDatasAviso.classList.add("hidden");
+    }
+    atualizarMotivo();
+    atualizarTempoServico();
+  }
+
+  function atualizarDatasAviso() {
+    if (elAviso.value === "Realizado") {
+      elCamposDatasAviso.classList.remove("hidden");
+    } else {
+      elCamposDatasAviso.classList.add("hidden");
+      elAvisoInicio.value = "";
+      elAvisoFim.value = "";
+    }
+    atualizarTempoServico();
+  }
+
+  function atualizarMotivo() {
+    var opcoes = MOTIVOS_POR_DEMISSAO[elDemissao.value];
+    if (opcoes) {
+      elCampoMotivo.classList.remove("hidden");
+      if (elDemissao.value === "Justa Causa") {
+        preencherSelect(elMotivo, opcoes, false);
+        elMotivo.disabled = true;
+      } else {
+        elMotivo.disabled = false;
+        preencherSelect(elMotivo, opcoes, true);
+      }
+    } else {
+      elCampoMotivo.classList.add("hidden");
+      elMotivo.value = "";
+    }
+  }
+
+  function atualizarTempoServico() {
+    var inicio = elDataAdmissao.value;
+    var fim = elAvisoFim.value || hoje();
+    if (!inicio) { elTempoServico.textContent = "—"; return; }
+    elTempoServico.textContent = tempoDeServico(inicio, fim);
+  }
+
+  function atualizarResponsavelNome() {
+    var opcoes = NOMES_POR_CARGO[elResponsavelCargo.value];
+    if (opcoes) {
+      elCampoResponsavelNome.classList.remove("hidden");
+      preencherSelect(elResponsavelNome, opcoes, true);
+    } else {
+      elCampoResponsavelNome.classList.add("hidden");
+      elResponsavelNome.value = "";
+    }
+  }
+
+  elDemissao.addEventListener("change", atualizarAvisoPrevio);
+  elAviso.addEventListener("change", atualizarDatasAviso);
+  elDataAdmissao.addEventListener("change", atualizarTempoServico);
+  elAvisoFim.addEventListener("change", atualizarTempoServico);
+  elResponsavelCargo.addEventListener("change", atualizarResponsavelNome);
+
+  // ── Assinatura (mouse no desktop, dedo no mobile — Pointer Events cobre os dois) ──
+  var canvas = $("assinatura");
+  var ctx = canvas.getContext("2d");
+  ctx.lineWidth = 2.2;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--text") || "#000";
+  var desenhando = false;
+  var temAssinatura = false;
+
+  function posicaoNoCanvas(e) {
+    var rect = canvas.getBoundingClientRect();
+    var escalaX = canvas.width / rect.width;
+    var escalaY = canvas.height / rect.height;
+    return { x: (e.clientX - rect.left) * escalaX, y: (e.clientY - rect.top) * escalaY };
+  }
+
+  canvas.addEventListener("pointerdown", function (e) {
+    desenhando = true;
+    temAssinatura = true;
+    var p = posicaoNoCanvas(e);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    canvas.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  canvas.addEventListener("pointermove", function (e) {
+    if (!desenhando) return;
+    var p = posicaoNoCanvas(e);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    e.preventDefault();
+  });
+  window.addEventListener("pointerup", function () { desenhando = false; });
+
+  $("limpar-assinatura").addEventListener("click", function () {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    temAssinatura = false;
+  });
+
+  // ── Envio ──
+  function mostrarErro(msg) {
+    elErro.textContent = msg;
+    elErroBox.style.display = "block";
+    elErroBox.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function ocultarErro() {
+    elErroBox.style.display = "none";
+  }
+
+  elForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    ocultarErro();
+
+    if (!temAssinatura) {
+      mostrarErro("Assine no campo de assinatura antes de enviar.");
+      return;
+    }
+    if (elAviso && !elCampoAviso.classList.contains("hidden") && !elAviso.value) {
+      mostrarErro("Selecione o Aviso Prévio.");
+      return;
+    }
+    if (!elCampoMotivo.classList.contains("hidden") && !elMotivo.value) {
+      mostrarErro("Selecione o Motivo.");
+      return;
+    }
+    if (!elCampoResponsavelNome.classList.contains("hidden") && !elResponsavelNome.value) {
+      mostrarErro("Selecione o nome do responsável.");
+      return;
+    }
+    if (!elForm.reportValidity()) return;
+
+    var payload = {
+      unidade: elUnidade.value,
+      bloco: elBloco.value,
+      nomeFuncionario: elNome.value.trim(),
+      demissao: elDemissao.value,
+      avisoPrevio: elCampoAviso.classList.contains("hidden") ? null : (elAviso.value || null),
+      avisoPrevioInicio: elCamposDatasAviso.classList.contains("hidden") ? null : (elAvisoInicio.value || null),
+      avisoPrevioFim: elCamposDatasAviso.classList.contains("hidden") ? null : (elAvisoFim.value || null),
+      dataAdmissao: elDataAdmissao.value,
+      motivo: elCampoMotivo.classList.contains("hidden") ? null : (elMotivo.value || null),
+      responsavelCargo: elResponsavelCargo.value,
+      responsavelNome: elCampoResponsavelNome.classList.contains("hidden") ? null : (elResponsavelNome.value || null),
+      assinaturaBase64: canvas.toDataURL("image/png"),
+    };
+
+    elBtnEnviar.disabled = true;
+    elBtnEnviar.textContent = "Enviando…";
+
+    fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then(function (res) {
+        return res.json().then(function (json) { return { status: res.status, json: json }; });
+      })
+      .then(function (r) {
+        if (!r.json.ok) throw new Error(r.json.erro || "Falha ao enviar o formulário.");
+        elForm.classList.add("hidden");
+        elProtocoloGerado.textContent = r.json.protocolo;
+        elCardSucesso.classList.remove("hidden");
+        elCardSucesso.scrollIntoView({ behavior: "smooth", block: "start" });
+      })
+      .catch(function (err) {
+        mostrarErro(err.message || "Não foi possível enviar. Verifique sua conexão e tente novamente.");
+      })
+      .finally(function () {
+        elBtnEnviar.disabled = false;
+        elBtnEnviar.textContent = "Enviar";
+      });
+  });
+
+  atualizarAvisoPrevio();
+})();
+</script>
+</body>
+</html>
